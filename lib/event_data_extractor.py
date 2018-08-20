@@ -9,7 +9,7 @@ class EventDataExtractor:
         return self.get_args()
     
     def get_args(self):
-        body = body = parse_qs(self.event['body'])
+        body = parse_qs(self.event['body'])
         try:
             text = body['text']
             params = text[0].split()
