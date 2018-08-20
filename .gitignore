@@ -1,0 +1,6 @@
+*pyc
+.idea
+__pycache__
+tdd_uuid_generator
+.pytest_cache
+.vscode
