@@ -40,7 +40,6 @@ class EventDataExtractorTestSpec(unittest.TestCase):
     def test_validSystemCode_returns_true_when_valid(self, mockRequest):
         self.assertTrue(self.dataValidator.validSystemCode())
     
-    
     @mock.patch.dict(os.environ,{'CMDB_API_KEY':'API_KEY'})
     @mock.patch('botocore.vendored.requests.get',side_effect=mocked_requests_get)
     def test_validSystemCode_raises_error_when_invalid_systemCode(self, mockRequest):
@@ -56,3 +55,52 @@ class EventDataExtractorTestSpec(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             self.assertTrue(self.dataValidator.validSystemCode())
         self.assertEqual('Bad Request, SystemCode invalid',str(context.exception))
+    
+    def test_validPattern_raises_error_with_invalid_start_end_pattern(self):
+        mock_pattern = {"pattern": "--"}
+        dataValidator = DataValidator(mock_pattern)
+        with self.assertRaises(Exception) as context:
+            dataValidator.validPattern()
+        self.assertEqual('Bad request, pattern does not pass validation',str(context.exception))
+        mock_pattern = {"pattern": "-pattern"}
+        dataValidator = DataValidator(mock_pattern)
+        with self.assertRaises(Exception) as context:
+            dataValidator.validPattern()
+        self.assertEqual('Bad request, pattern does not pass validation',str(context.exception))
+        mock_pattern = {"pattern": "pattern-"}
+        dataValidator = DataValidator(mock_pattern)
+        with self.assertRaises(Exception) as context:
+            dataValidator.validPattern()
+        self.assertEqual('Bad request, pattern does not pass validation',str(context.exception))
+        mock_pattern = {"pattern": "_pattern"}
+        dataValidator = DataValidator(mock_pattern)
+        with self.assertRaises(Exception) as context:
+            dataValidator.validPattern()
+        self.assertEqual('Bad request, pattern does not pass validation',str(context.exception))
+    
+    def test_validPattern_raises_error_with_non_alphanumeric_characters(self):
+        mock_pattern = {"pattern": "ft.id*"}
+        dataValidator = DataValidator(mock_pattern)
+        with self.assertRaises(Exception) as context:
+            dataValidator.validPattern()
+        self.assertEqual('Bad request, pattern does not pass validation',str(context.exception))
+    
+        mock_pattern = {"pattern": "ft.id!"}
+        dataValidator = DataValidator(mock_pattern)
+        with self.assertRaises(Exception) as context:
+            dataValidator.validPattern()
+        self.assertEqual('Bad request, pattern does not pass validation',str(context.exception))
+    
+        mock_pattern = {"pattern": "ft.id@"}
+        dataValidator = DataValidator(mock_pattern)
+        with self.assertRaises(Exception) as context:
+            dataValidator.validPattern()
+        self.assertEqual('Bad request, pattern does not pass validation',str(context.exception))
+     
+    
+
+
+
+
+
+

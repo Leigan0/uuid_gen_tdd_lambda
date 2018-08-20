@@ -1,4 +1,5 @@
 import os
+import re
 from botocore.vendored import requests
 
 class DataValidator:
@@ -20,3 +21,12 @@ class DataValidator:
         if (r.status_code) != 200:
             raise Exception("Bad Request, SystemCode invalid")
         return True
+    
+    def validPattern(self):
+        pattern = self.data['pattern']
+        if ("--" in pattern or pattern.startswith("-") or pattern.endswith("-") or pattern.startswith("_")):
+            raise Exception("Bad request, pattern does not pass validation")
+        elif not bool(re.match("^[A-Za-z0-9.\-_]+$", pattern)):
+            raise Exception("Bad request, pattern does not pass validation")
+        return True
+
