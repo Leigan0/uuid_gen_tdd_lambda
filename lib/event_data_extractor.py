@@ -1,7 +1,7 @@
 from urlparse import parse_qs
 import re 
 
-class KeyValidator:
+class EventDataExtractor:
     def __init__(self,event):
         self.event = event
     

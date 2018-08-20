@@ -1,5 +1,5 @@
 import unittest
-from lib.key_validator import KeyValidator
+from lib.event_data_extractor import EventDataExtractor
 
 
 mock_event = {
@@ -17,25 +17,25 @@ mock_event = {
     'isBase64Encoded': False
     }
 
-class KeyValidatorTestSpec(unittest.TestCase):
+class EventDataExtractorTestSpec(unittest.TestCase):
 
     def setUp(self):
-        self.keyValidator = KeyValidator(mock_event)
+        self.eventDataExtractor = EventDataExtractor(mock_event)
 
     def test_it_extracts_token_patten_systemCode_email_from_request(self):
-        self.assertEqual(self.keyValidator.get_keys(), { "token": "123345","pattern":"datatechnology.etldashboard", "systemCode":"citrixxendesktop", "email":"test.email@ft.com"})
+        self.assertEqual(self.eventDataExtractor.get_keys(), { "token": "123345","pattern":"datatechnology.etldashboard", "systemCode":"citrixxendesktop", "email":"test.email@ft.com"})
 
     def test_it_raises_error_if_not_passed_test_key_within_body(self):
         mock_event['body'] = 'token=123345'
-        keyValidator = KeyValidator(mock_event)
+        eventDataExtractor = EventDataExtractor(mock_event)
         with self.assertRaises(KeyError) as context:
-            keyValidator.get_keys()
+            eventDataExtractor.get_keys()
         self.assertTrue('text' in context.exception)
         
     def test_it_raises_error_if_not_passed_test_three_arguments_within_text_key(self):
         mock_event['body'] = 'token=123345&text=pattern+systemCode'
-        keyValidator = KeyValidator(mock_event)
+        eventDataExtractor = EventDataExtractor(mock_event)
         with self.assertRaises(IndexError) as context:
-            keyValidator.get_keys()
+            eventDataExtractor.get_keys()
         self.assertTrue('list index out of range' in context.exception)
 
