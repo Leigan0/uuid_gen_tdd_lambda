@@ -4,6 +4,17 @@ import os
 
 from lib.data_validator import DataValidator
 mock_data = { "token": "123345","pattern":"datatechnology.etldashboard", "systemCode":"citrixxendesktop", "email":"test.email@ft.com"}
+
+def mocked_requests_get(*args, **kwargs):
+    class MockResponse:
+         def __init__(self, statusCode):
+            self.status_code = statusCode
+        
+    if args[0] == 'https://cmdb.in.ft.com/v3/items/system/citrixxendesktop' and kwargs == {'headers': {'x-api-key': 'API_KEY'}}:
+        return MockResponse(200)
+        
+    return MockResponse(404)
+
 class EventDataExtractorTestSpec(unittest.TestCase):
     def setUp(self):
         self.dataValidator = DataValidator(mock_data)
@@ -17,3 +28,31 @@ class EventDataExtractorTestSpec(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             self.dataValidator.validToken()
         self.assertEqual('Bad Request, Slack token invalid',str(context.exception))
+    
+    @mock.patch.dict(os.environ,{'CMDB_API_KEY':'API_KEY'})
+    @mock.patch('botocore.vendored.requests.get',side_effect=mocked_requests_get)
+    def test_validSystemCode_sends_request_with_url_and_api_key(self,mockRequest):
+        self.dataValidator.validSystemCode()
+        mockRequest.assert_called_once_with("https://cmdb.in.ft.com/v3/items/system/citrixxendesktop",  headers={'x-api-key': 'API_KEY'})
+        
+    @mock.patch.dict(os.environ,{'CMDB_API_KEY':'API_KEY'})
+    @mock.patch('botocore.vendored.requests.get',side_effect=mocked_requests_get)
+    def test_validSystemCode_returns_true_when_valid(self, mockRequest):
+        self.assertTrue(self.dataValidator.validSystemCode())
+    
+    
+    @mock.patch.dict(os.environ,{'CMDB_API_KEY':'API_KEY'})
+    @mock.patch('botocore.vendored.requests.get',side_effect=mocked_requests_get)
+    def test_validSystemCode_raises_error_when_invalid_systemCode(self, mockRequest):
+        mock_data_invalid_systemCode = { "token": "123345","pattern":"datatechnology.etldashboard", "systemCode":"invalidSystemCode", "email":"test.email@ft.com"}
+        dataValidator = DataValidator(mock_data_invalid_systemCode)
+        with self.assertRaises(Exception) as context:
+            self.assertTrue(dataValidator.validSystemCode())
+        self.assertEqual('Bad Request, SystemCode invalid',str(context.exception))
+    
+    @mock.patch.dict(os.environ,{'CMDB_API_KEY':'INVALID_KEY'})
+    @mock.patch('botocore.vendored.requests.get',side_effect=mocked_requests_get)
+    def test_validSystemCode_raises_error_when_invalid_API_KEY(self, mockRequest):
+        with self.assertRaises(Exception) as context:
+            self.assertTrue(self.dataValidator.validSystemCode())
+        self.assertEqual('Bad Request, SystemCode invalid',str(context.exception))
