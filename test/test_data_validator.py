@@ -96,7 +96,11 @@ class EventDataExtractorTestSpec(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             dataValidator.validPattern()
         self.assertEqual('Bad request, pattern does not pass validation',str(context.exception))
-     
+
+    # @mock.patch.dict(os.environ,{'SLACK_TOKEN':'123345','CMDB_API_KEY':'API_KEY'})
+    # @mock.patch('botocore.vendored.requests.get',side_effect=mocked_requests_get)
+    # def test_isDataValid_returns_true_valid_data(self):
+    #     self.assertTrue(self.dataValidator.isDataValid())
     
 
 
