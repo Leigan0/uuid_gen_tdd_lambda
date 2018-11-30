@@ -9,6 +9,8 @@ def mocked_requests_get(*args, **kwargs):
     class MockResponse:
          def __init__(self, statusCode):
             self.status_code = statusCode
+
+            # should be biz ops
         
     if args[0] == 'https://cmdb.in.ft.com/v3/items/system/citrixxendesktop' and kwargs == {'headers': {'x-api-key': 'API_KEY'}}:
         return MockResponse(200)
