@@ -58,7 +58,7 @@ s3transfer==0.1.13
 scandir==1.9.0
 singledispatch==3.4.0.3
 six==1.11.0
-urllib3==1.23
+urllib3==1.26.5
 websocket-client==0.51.0
 Werkzeug==0.14.1
 wrapt==1.10.11
